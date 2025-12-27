@@ -2,8 +2,8 @@ services:
   server:
     build:
       context: .
-    image: aashishpal09/generator-server:0.0.1
-    container_name: generator-
+    image: aashishpal09/generator-server:0.0.2
+    container_name: generator-server
     platform: linux/amd64
     ports:
       - "3001:3000"
