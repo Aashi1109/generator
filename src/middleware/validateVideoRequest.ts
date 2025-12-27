@@ -9,7 +9,7 @@ export interface ValidatedVideoRequest extends Request {
   withExtension?: boolean;
 }
 
-export function validateVideoRequestMiddleware(
+export default function validateVideoRequestMiddleware(
   req: ValidatedVideoRequest,
   res: Response,
   next: NextFunction

@@ -1,7 +1,7 @@
 import express, { Express } from "express";
 import { logger } from "@/config/logger";
 
-import { errorHandler } from "@/middleware/errorHandler";
+import { errorHandler } from "@/middleware";
 import v1Routes from "@/app/v1/root.route";
 
 const app: Express = express();

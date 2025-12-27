@@ -1,15 +1,12 @@
 import { Router, Response } from "express";
 import { VideoService } from "@/services/video.service";
 import { logger } from "@/config/logger";
-import { asyncHandler } from "@/middleware/asyncHandler";
-import { upload } from "@/middleware/upload";
-import {
-  validateVideoRequestMiddleware,
-  ValidatedVideoRequest,
-} from "@/middleware/validateVideoRequest";
+
+import { validateVideoRequestMiddleware, asyncHandler } from "@/middleware";
+import { config } from "@/config";
+import { ValidatedVideoRequest } from "@/middleware/validateVideoRequest";
 
 const router: Router = Router();
-const videoService = new VideoService();
 
 router.post(
   "/video/generate",
@@ -18,6 +15,7 @@ router.post(
     logger.info("Video generation request received", {
       body: req.body,
     });
+    const apiKey = req.headers[config.apiKeyHeaderName] as string;
 
     // Build request with validated body and optional video file
     const request = {
@@ -25,6 +23,7 @@ router.post(
     };
 
     // Generate video
+    const videoService = new VideoService(apiKey);
     const { buffer, uri } = await videoService.generateVideo(request);
 
     logger.info("Video generation request completed successfully");

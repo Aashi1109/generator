@@ -17,11 +17,11 @@ export class VideoService {
   private readonly maxPollingAttempts: number;
   private readonly pollingInterval: number;
 
-  constructor() {
+  constructor(apiKey: string) {
     this.maxPollingAttempts = config.maxPollingAttempts;
     this.pollingInterval = config.pollingInterval;
 
-    this.client = new GoogleGenAI({ apiKey: config.geminiApiKey });
+    this.client = new GoogleGenAI({ apiKey });
   }
 
   private async pollOperation(operation: any): Promise<any> {

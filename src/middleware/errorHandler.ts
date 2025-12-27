@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { BaseException } from "@/errors/exceptions";
 import { logger } from "@/config/logger";
 
-export function errorHandler(
+export default function errorHandler(
   err: Error | BaseException,
   req: Request,
   res: Response,
