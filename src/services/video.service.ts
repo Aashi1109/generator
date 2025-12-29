@@ -72,7 +72,7 @@ export class VideoService {
     return polledOperation;
   }
 
-  private async downloadVideo(videoFile: any): Promise<Buffer> {
+  async downloadVideo(videoFile: any): Promise<Buffer> {
     const tempFilePath = path.join(os.tmpdir(), `video-${Date.now()}.mp4`);
 
     try {
@@ -118,7 +118,7 @@ export class VideoService {
 
   async generateVideo(
     request: VideoGenerationRequest
-  ): Promise<{ buffer?: Buffer; uri?: string }> {
+  ): Promise<{ uri: string }> {
     const {
       prompt,
       withExtension,
@@ -160,22 +160,13 @@ export class VideoService {
       });
 
       // Get the generated video
-      if (!polledOperation.response?.generatedVideos?.[0]?.video) {
+      if (!polledOperation.response?.generatedVideos?.[0]?.video)
         throw new VideoGenerationException("No video generated in response");
-      }
 
       const generatedVideoFile =
         polledOperation.response.generatedVideos[0].video;
 
-      if ((withExtension && previousVideoUri) || withExtension)
-        return generatedVideoFile;
-
-      logger.info("Video generation completed successfully", {
-        videoUri: generatedVideoFile.uri,
-      });
-
-      // Download and return the video
-      return { buffer: await this.downloadVideo(generatedVideoFile) };
+      return generatedVideoFile;
     } catch (error: any) {
       if (
         error instanceof VideoGenerationException ||

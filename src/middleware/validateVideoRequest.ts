@@ -6,7 +6,6 @@ import {
 
 export interface ValidatedVideoRequest extends Request {
   validatedBody?: VideoGenerationRequest;
-  withExtension?: boolean;
 }
 
 export default function validateVideoRequestMiddleware(
@@ -18,7 +17,6 @@ export default function validateVideoRequestMiddleware(
     // Validate JSON body (prompt and optional fields)
     const validatedBody = validateVideoRequest(req.body);
     req.validatedBody = validatedBody;
-    req.withExtension = req.body.withExtension || false;
 
     next();
   } catch (error) {
