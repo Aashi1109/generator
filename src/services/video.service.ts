@@ -121,7 +121,6 @@ export class VideoService {
   ): Promise<{ uri: string }> {
     const {
       prompt,
-      withExtension,
       previousVideoUri,
       model = VIDEO_MODELS.VEO_3_1_FAST_GENERATE_PREVIEW,
       duration = 8,
@@ -130,7 +129,6 @@ export class VideoService {
 
     logger.info("Starting video generation", {
       prompt: prompt.substring(0, 100),
-      withExtension,
     });
 
     try {

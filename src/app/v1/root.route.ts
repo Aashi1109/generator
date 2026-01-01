@@ -6,7 +6,7 @@ import { validateVideoRequestMiddleware, asyncHandler } from "@/middleware";
 import { config } from "@/config";
 import { ValidatedVideoRequest } from "@/middleware/validateVideoRequest";
 import { VIDEO_MODELS } from "@/constants";
-import { ApiKeyException } from "@/errors/exceptions";
+import { ApiKeyException, ValidationException } from "@/errors/exceptions";
 
 const router: Router = Router();
 
@@ -52,9 +52,8 @@ router.get(
     const apiKey =
       req.headers[config.apiKeyHeaderName] || (req.query.key as string);
     const { uri } = req.query;
-    if (!uri) {
-      return res.status(400).json({ error: "URI is required" });
-    }
+    if (!uri) throw new ValidationException("URI is required");
+
     const videoService = new VideoService(apiKey as string);
     const buffer = await videoService.downloadVideo(uri as string);
     res.setHeader("Content-Type", "video/mp4");
