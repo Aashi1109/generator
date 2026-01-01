@@ -76,7 +76,6 @@ export interface VideoGenerationRequest {
   withExtension?: boolean;
   previousVideoUri?: string;
   model?: (typeof VIDEO_MODELS)[keyof typeof VIDEO_MODELS];
-  outputAsVideoFile?: boolean;
 }
 
 export function validateVideoRequest(data: any): VideoGenerationRequest {

@@ -21,7 +21,7 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use("/v1", v1Routes);
+app.use("/v1/video", v1Routes);
 
 // Health check endpoint
 app.get("/health", (req, res) => {

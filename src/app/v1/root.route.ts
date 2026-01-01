@@ -1,16 +1,17 @@
-import { Router, Response } from "express";
+import { Router, Response, Request } from "express";
 import { VideoService } from "@/services/video.service";
 import { logger } from "@/config/logger";
 
 import { validateVideoRequestMiddleware, asyncHandler } from "@/middleware";
 import { config } from "@/config";
 import { ValidatedVideoRequest } from "@/middleware/validateVideoRequest";
+import { VIDEO_MODELS } from "@/constants";
 import { ApiKeyException } from "@/errors/exceptions";
 
 const router: Router = Router();
 
 router.post(
-  "/video/generate",
+  "/generate",
   validateVideoRequestMiddleware,
   asyncHandler(async (req: ValidatedVideoRequest, res: Response) => {
     logger.info("Video generation request received", {
@@ -22,8 +23,6 @@ router.post(
 
     if (!apiKey) throw new ApiKeyException("Invalid or missing API key");
 
-    const { outputAsVideoFile } = req.validatedBody || {};
-
     // Build request with validated body and optional video file
     const request = {
       ...req.validatedBody!,
@@ -34,19 +33,35 @@ router.post(
     const response = await videoService.generateVideo(request);
 
     logger.info("Video generation request completed successfully");
-    if (!outputAsVideoFile) return res.json({ data: response });
-    const downloadedVideoBuffer = await videoService.downloadVideo(response);
+    return res.json({ data: response });
+  })
+);
 
-    if (downloadedVideoBuffer) {
-      // Send video file
-      res.setHeader("Content-Type", "video/mp4");
-      res.setHeader(
-        "Content-Disposition",
-        'attachment; filename="generated-video.mp4"'
-      );
-      res.setHeader("Content-Length", downloadedVideoBuffer.length.toString());
-      return res.send(downloadedVideoBuffer);
+router.get(
+  "/models",
+  asyncHandler(async (req: Request, res: Response) => {
+    res.json({ data: Object.values(VIDEO_MODELS) });
+  })
+);
+
+router.get(
+  "/download",
+  asyncHandler(async (req: Request, res: Response) => {
+    const apiKey =
+      req.headers[config.apiKeyHeaderName] || (req.query.key as string);
+    const { uri } = req.query;
+    if (!uri) {
+      return res.status(400).json({ error: "URI is required" });
     }
+    const videoService = new VideoService(apiKey as string);
+    const buffer = await videoService.downloadVideo(uri as string);
+    res.setHeader("Content-Type", "video/mp4");
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="generated-video.mp4"'
+    );
+    res.setHeader("Content-Length", buffer.length.toString());
+    res.send(buffer);
   })
 );
 
