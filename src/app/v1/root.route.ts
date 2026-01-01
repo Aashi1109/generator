@@ -32,7 +32,9 @@ router.post(
     const videoService = new VideoService(apiKey);
     const response = await videoService.generateVideo(request);
 
-    logger.info("Video generation request completed successfully");
+    logger.info("Video generation request completed successfully", {
+      response,
+    });
     return res.json({ data: response });
   })
 );
