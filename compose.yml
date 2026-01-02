@@ -2,7 +2,7 @@ services:
   server:
     build:
       context: .
-    image: aashishpal09/generator-server:0.0.2
+    image: aashishpal09/generator-server:latest
     container_name: generator-server
     platform: linux/amd64
     ports:
