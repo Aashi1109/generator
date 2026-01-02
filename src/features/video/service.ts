@@ -1,18 +1,26 @@
 import { GoogleGenAI } from "@google/genai";
-import { logger } from "@/config/logger";
-import { config } from "@/config";
 import {
-  VideoGenerationException,
+  logger,
+  config,
   OperationTimeoutException,
-  ApiKeyException,
-} from "@/errors/exceptions";
-import { VideoGenerationRequest } from "@/validators/video.validator";
+  UnauthorizedException,
+  createExceptionClass,
+} from "@/shared";
+
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
-import { VIDEO_MODELS } from "@/constants";
+import { VideoGenerationRequest } from "./defs";
+import { VIDEO_MODELS } from "./constant";
 
-export class VideoService {
+const VideoGenerationException = createExceptionClass(
+  "VideoGenerationException",
+  500,
+  "VIDEO_GENERATION_ERROR",
+  "Video generation failed"
+);
+
+export default class VideoService {
   private client: GoogleGenAI;
   private readonly maxPollingAttempts: number;
   private readonly pollingInterval: number;
@@ -169,7 +177,7 @@ export class VideoService {
       if (
         error instanceof VideoGenerationException ||
         error instanceof OperationTimeoutException ||
-        error instanceof ApiKeyException
+        error instanceof UnauthorizedException
       ) {
         throw error;
       }

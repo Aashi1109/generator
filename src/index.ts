@@ -1,11 +1,11 @@
-import app from "./app";
-import { config } from "./config";
-import { logger } from "./config/logger";
+import { logger } from "./shared";
 
-// Start server
-app.listen(config.port, () => {
-  logger.info(`Server is running on port ${config.port}`, {
-    port: config.port,
-    environment: config.nodeEnv,
+const type = process.env.APP_TYPE;
+
+import(`./app/${type}`)
+  .then(() => {
+    logger.info(`App ${type} started`);
+  })
+  .catch((err) => {
+    logger.error(`App ${type} failed to start`, err);
   });
-});

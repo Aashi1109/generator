@@ -1,5 +1,5 @@
 import winston from "winston";
-import { config } from "./index";
+import { config } from "./config";
 
 const logLevel = config.nodeEnv === "production" ? "info" : "debug";
 

@@ -1,8 +1,6 @@
-import Ajv, { ValidateFunction } from "ajv";
-import { ValidationException } from "@/errors/exceptions";
-import { VIDEO_MODELS } from "@/constants";
-
-const ajv = new Ajv({ allErrors: true });
+import { validateAjvSchema } from "@/shared";
+import { VideoGenerationRequest } from "./defs";
+import { VIDEO_MODELS } from "./constant";
 
 const videoGenerationSchema = {
   type: "object",
@@ -67,28 +65,5 @@ const videoGenerationSchema = {
   },
 };
 
-const validate: ValidateFunction = ajv.compile(videoGenerationSchema);
-
-export interface VideoGenerationRequest {
-  prompt: string;
-  duration?: 4 | 6 | 8;
-  resolution?: "720p" | "1080p";
-  previousVideoUri?: string;
-  model?: (typeof VIDEO_MODELS)[keyof typeof VIDEO_MODELS];
-}
-
-export function validateVideoRequest(data: any): VideoGenerationRequest {
-  const valid = validate(data);
-
-  if (!valid) {
-    const errors = validate.errors?.map((err) => ({
-      field: err.instancePath || err.params?.missingProperty || "root",
-      message: err.message,
-      params: err.params,
-    }));
-
-    throw new ValidationException("Invalid request payload", errors);
-  }
-
-  return data as VideoGenerationRequest;
-}
+export const validateVideoGenerationRequest = (data: VideoGenerationRequest) =>
+  validateAjvSchema<VideoGenerationRequest>(videoGenerationSchema, data);
