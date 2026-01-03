@@ -2,7 +2,7 @@ services:
   server:
     build:
       context: .
-    image: aashishpal09/generator-server:0.0.3
+    image: aashishpal09/generator-server:latest
     container_name: generator-server
     platform: linux/amd64
     ports:
@@ -15,7 +15,7 @@ services:
       - .env.local
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:$PORT/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
