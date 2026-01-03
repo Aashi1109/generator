@@ -5,6 +5,7 @@ import {
   OperationTimeoutException,
   UnauthorizedException,
   createExceptionClass,
+  ValidationException,
 } from "@/shared";
 
 import * as fs from "fs";
@@ -80,12 +81,12 @@ export default class VideoService {
     return polledOperation;
   }
 
-  async downloadVideo(videoFile: any): Promise<Buffer> {
+  async download(uri: string): Promise<Buffer> {
     const tempFilePath = path.join(os.tmpdir(), `video-${Date.now()}.mp4`);
 
     try {
       await this.client.files.download({
-        file: videoFile,
+        file: { uri },
         downloadPath: tempFilePath,
       });
 
@@ -124,17 +125,13 @@ export default class VideoService {
     }
   }
 
-  async generateVideo(
-    request: VideoGenerationRequest
-  ): Promise<{ uri: string }> {
-    const {
-      prompt,
-      previousVideoUri,
-      model = VIDEO_MODELS.VEO_3_1_FAST_GENERATE_PREVIEW,
-      duration = 8,
-      resolution = "720p",
-    } = request;
-
+  async generate({
+    prompt,
+    previousVideoUri,
+    model = VIDEO_MODELS.VEO_3_1_FAST_GENERATE_PREVIEW,
+    duration = 8,
+    resolution = "720p",
+  }: VideoGenerationRequest): Promise<{ buffer?: Buffer; uri: string }> {
     logger.info("Starting video generation", {
       prompt: prompt.substring(0, 100),
     });
@@ -191,6 +188,15 @@ export default class VideoService {
         error.message || "An unexpected error occurred during video generation",
         error
       );
+    }
+  }
+
+  list(listType: string) {
+    switch (listType) {
+      case "models":
+        return { models: Object.values(VIDEO_MODELS) };
+      default:
+        throw new ValidationException(`Invalid list type: ${listType}`);
     }
   }
 }

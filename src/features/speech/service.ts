@@ -1,20 +1,14 @@
 import { GoogleGenAI } from "@google/genai";
-import { SpeechGenerationRequest } from "./defs";
+import { SpeechGenerationRequest, WavConversionOptions } from "./defs";
 import { GEMINI_TTS_VOICES, SPEECH_MODELS } from "./constant";
 import { writeFile } from "node:fs/promises";
 import mime from "mime";
-import { FailureException, getRandomUUID, logger } from "@/shared";
-import * as fs from "fs";
+import { FailureException, logger, ValidationException } from "@/shared";
 import * as os from "os";
 import * as path from "node:path";
+import BaseGenerationService from "../base/BaseClass";
 
-interface WavConversionOptions {
-  numChannels: number;
-  sampleRate: number;
-  bitsPerSample: number;
-}
-
-export default class SpeechService {
+export default class SpeechService implements BaseGenerationService {
   private readonly client: GoogleGenAI;
 
   constructor(apiKey: string) {
@@ -26,7 +20,7 @@ export default class SpeechService {
     model = SPEECH_MODELS.GEMINI_2_5_FLASH_PREVIEW_TTS,
     speakers,
     voice = GEMINI_TTS_VOICES.PUCK.name,
-  }: SpeechGenerationRequest) {
+  }: SpeechGenerationRequest): Promise<{ buffer?: Buffer; uri?: string }> {
     let speechConfig: Record<string, any>;
 
     if (speakers?.length) {
@@ -95,6 +89,21 @@ export default class SpeechService {
     logger.info("Speech generation response", {
       response,
     });
+  }
+
+  async download(uri: string): Promise<Buffer> {
+    throw new ValidationException(`Download not supported for speech service`);
+  }
+
+  async list(listType: string): Promise<Record<string, any> | any[]> {
+    switch (listType) {
+      case "models":
+        return { models: Object.values(SPEECH_MODELS) };
+      case "voices":
+        return { voices: Object.values(GEMINI_TTS_VOICES) };
+      default:
+        throw new ValidationException(`Invalid list type: ${listType}`);
+    }
   }
 
   async saveBinaryFile(fileName: string, content: Buffer) {

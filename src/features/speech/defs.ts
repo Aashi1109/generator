@@ -19,3 +19,9 @@ export interface GeminiTTSVoice {
   gender: "male" | "female";
   description: string;
 }
+
+export interface WavConversionOptions {
+  numChannels: number;
+  sampleRate: number;
+  bitsPerSample: number;
+}
