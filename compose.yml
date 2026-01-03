@@ -2,19 +2,20 @@ services:
   server:
     build:
       context: .
-    image: aashishpal09/generator-server:latest
+    image: aashishpal09/generator-server:0.0.3
     container_name: generator-server
     platform: linux/amd64
     ports:
       - "3001:3000"
     environment:
       - NODE_ENV=production
+      - APP_TYPE=server
       - PORT=3000
     env_file:
       - .env.local
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:$PORT/health"]
       interval: 30s
       timeout: 10s
       retries: 3
